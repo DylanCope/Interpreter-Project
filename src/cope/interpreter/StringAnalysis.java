@@ -146,11 +146,11 @@ public class StringAnalysis
 		
 		strFunction = separateVerifiedStrings(verifiedStrings, strFunction);
 		strFunction = transformToBinaryOperations(strFunction, binarySymbols, binaryPriorities);
-		
+		System.out.println(strFunction);
 		return recursivelyGenerateFunctionTree(
 				strFunction, variables, 
 				binarySymbols, binaryInstructions, 
-				unaryNames, unaryInstructions);
+				unaryNames, unaryInstructions).simplify();
 	}
 	
 	private static Function recursivelyGenerateFunctionTree(
@@ -177,7 +177,7 @@ public class StringAnalysis
 							unaryNames, unaryInstructions);
 				} catch (Exception e1){
 					if (Arrays.binarySearch(variables, operation[0]) >= 0)
-						leftNode = new FunctionalVariable(operation[0]).setFunctionString(operation[0]);
+						leftNode = new FunctionalVariable(operation[0]);
 					else throw e1;
 				}
 			}
@@ -197,15 +197,15 @@ public class StringAnalysis
 							unaryNames, unaryInstructions);
 				} catch (Exception e1){
 					if (Arrays.binarySearch(variables, operation[2]) >= 0)
-						rightNode = new FunctionalVariable(operation[2]).setFunctionString(operation[2]);
+						rightNode = new FunctionalVariable(operation[2]);
 					else throw e1;
 				}
 			}
 			return new BinaryFunction(
 					leftNode, 
 					rightNode, 
-					binaryInstructions[Arrays.binarySearch(binarySymbols, operation[1].charAt(0))])
-						.setFunctionString(strFunction);
+					binaryInstructions[Arrays.binarySearch(binarySymbols, operation[1].charAt(0))]);
+//						.setFunctionString(strFunction);
 		} catch (Exception e) {
 			try {
 				return parseAsUnaryFunction(
@@ -233,7 +233,7 @@ public class StringAnalysis
 					return new UnaryFunction(
 							recursivelyGenerateFunctionTree(
 									strFunction.substring(i), variables, binarySymbols, binaryInstructions, unaryNames, unaryInstructions),
-							unaryInstructions[Arrays.binarySearch(unaryNames, function)]).setFunctionString(strFunction);
+							unaryInstructions[Arrays.binarySearch(unaryNames, function)]);
 				} catch (Exception e) {
 					throw new Exception("Unidentified string: " + function);
 				}
@@ -304,9 +304,10 @@ public class StringAnalysis
 		if (!areThereBinaryOperations(str, operators)) return str;
 		
 		ArrayList<String[]> possibilities = new ArrayList<String[]>();
-		for (int i = 0; i < str.length(); i++) {
-			
-			if (str.charAt(i) == '(') {
+		for (int i = 0; i < str.length(); i++) 
+		{	
+			if (str.charAt(i) == '(') 
+			{
 				String bracketedString = findBracketedString(str.substring(i));
 				int numberOfBinaryOperations = 0;
 				int bracketCount = 0;
@@ -317,7 +318,8 @@ public class StringAnalysis
 							Arrays.binarySearch(operators, bracketedString.charAt(j)) >= 0)
 						numberOfBinaryOperations++;
 				}
-				if (numberOfBinaryOperations > 1) {
+				if (numberOfBinaryOperations > 1) 
+				{
 					
 					String fst = str.substring(0, i+1);
 					String snd = str.substring(i + bracketedString.length() + 1);
@@ -334,7 +336,8 @@ public class StringAnalysis
 				possibilities.add(new String[]{
 						str.substring(0, i), 
 						str.substring(i, i+1), 
-						str.substring(i+1)});
+						str.substring(i+1)
+				});
 		}
 		
 		possibilities = sortBasedOnPriorities(

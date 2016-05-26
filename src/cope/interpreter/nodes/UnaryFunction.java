@@ -14,6 +14,7 @@ public class UnaryFunction extends Function
 	{
 		this.instruction = operation; this.childFunction = childNode;
 		childFunction.setParent(this);
+		children = new Function[]{childFunction};
 	}
 	
 	@Override
@@ -26,11 +27,7 @@ public class UnaryFunction extends Function
 	public float evaluate(Variable var) throws Exception {
 		return instruction.evaluate(childFunction.evaluate(var));
 	}
-	
-	@Override
-	public Function[] getChildren() { return new Function[]{childFunction}; }
-	@Override
-	public Function setChildren(Function[] children) { this.childFunction = children[0]; return this; }
+
 	@Override
 	public Function getParent() { return parent; }
 	@Override
@@ -45,8 +42,9 @@ public class UnaryFunction extends Function
 				pattern = standardDifferentiationPatterns[i];
 				break;
 			}
-		
-		return pattern.differentiate(this, var);
+
+		Function diff = pattern.differentiate(this, var);
+		return diff;
 	}
 	
 	public String getString()

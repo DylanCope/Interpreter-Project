@@ -1,0 +1,140 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[margin=2.0cm]{geometry}
+\usepackage{stmaryrd}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumerate}
+\usepackage{bbold}
+\usepackage{dsfont}
+\usepackage{algorithm2e}
+\usepackage{changepage}
+\usepackage{undertilde}
+\usepackage{hyperref}
+\hypersetup{pdftex,colorlinks=true,allcolors=blue}
+\usepackage{hypcap}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{multicol}
+\usepackage[amsmath,hyperref]{ntheorem}
+\usepackage{framed}
+\usepackage{booktabs}
+\usepackage{needspace}
+\usepackage{qtree}
+
+% Default fixed font does not support bold face
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{10} % for bold
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{10}  % for normal
+
+% Custom colors
+\usepackage{color}
+\definecolor{red}{rgb}{1,0,0}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+\usepackage{listings}
+
+% Python style for highlighting
+\newcommand\pythonstyle{\lstset{
+	language=Python,
+	basicstyle=\ttm,
+	otherkeywords={self},             % Add keywords here
+	keywordstyle=\ttb\color{deepblue},
+	emph={MyClass,__init__},          % Custom highlighting
+	emphstyle=\ttb\color{deepred},    % Custom highlighting style
+	commentstyle=\ttb\color{red},
+	stringstyle=\color{deepgreen},
+	frame=tb,                         % Any extra options here
+	showstringspaces=false     
+}}
+
+
+% Python environment
+\lstnewenvironment{python}[1][]
+{
+\pythonstyle
+\lstset{#1}
+}
+{}
+
+% Python for external files
+\newcommand\pythonexternal[2][]{{
+\pythonstyle
+\lstinputlisting[#1]{#2}}}
+
+% Python for inline
+\newcommand\pythoninline[1]{{\pythonstyle\lstinline!#1!}}
+\lstset{showstringspaces=false}
+
+\newcommand{\thm}{
+    \theoremstyle{plain}
+    \theoremseparator{.}
+    \theorembodyfont{\upshape}
+    \theoremheaderfont{\bfseries}
+}
+
+\thm \newtheorem{definition}{Definition}[subsection]
+\thm\newtheorem{proposition}[definition]{Proposition}
+\thm\newtheorem{theorem}[definition]{Theorem}
+\thm\newtheorem{lemma}[definition]{Lemma}
+\thm\newtheorem{example}[definition]{Example}
+
+
+\setlength{\parskip}{1em}
+\setlength{\parindent}{0em}
+\SetKwProg{Fn}{Function}{\string:}{}
+
+\newcommand\tab[1][1cm]{\hspace*{#1}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Dylan Cope}
+\rhead{2016}
+
+\begin{document}
+
+	\begin{center}
+	{\Large\bf Mathematical Interpreting}
+
+	\vspace{.1in}
+	Project Summary
+	\vspace{.2in}
+
+	\end{center}
+	
+	\section{Functions}
+	
+	Functions are converted in tree form for manipulation and evaluation, consider the function $f$,
+	$$
+		f(x, y) = (4x^y - 2\sinh y)(9xy + \cos^2 \ln x)
+	$$
+	the equivalent function tree is,
+	
+	\Tree [.$f(x,y)$ [.$\times$ 
+		[.$-$ 
+			[.$\times$ 
+				[.4 ] 
+				[.pow [.$x$ ] [.$y$ ] ]
+			] [.$\times$ 
+				[.2 ]
+				[.sinh [.$y$ ] ]
+			]
+		] [ .$+$ 
+			[.$\times$ [.9 ] [.$\times$ [.$x$ ] [.$y$ ] ] ] 
+			[.pow 
+				[.cos [.ln [.$x$ ] ] ]
+				[.2 ]
+			]
+		]
+	] ]
+	
+	\section{Parsing}
+	
+	\section{Differentiation}
+	
+	\section{Simplification}
+	
+\end{document}

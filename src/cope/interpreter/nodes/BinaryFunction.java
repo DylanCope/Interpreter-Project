@@ -7,21 +7,21 @@ import cope.interpreter.Variable;
 public class BinaryFunction extends Function 
 {
 	private BinaryInstruction instruction;
-	private Function leftChild, rightChild;
 	private Function parent;
 	
 	public BinaryFunction(Function childNode0, Function childNode1, BinaryInstruction operation)
 	{
-		this.leftChild = childNode0; this.rightChild = childNode1; this.instruction = operation;
-		leftChild.setParent(this);
-		rightChild.setParent(this);
+		this.instruction = operation;
+		childNode0.setParent(this);
+		childNode1.setParent(this);
+		children = new Function[]{childNode0, childNode1};
 	}
 	
 	public float evaluate(Variable var) throws Exception
 	{
 		ArrayList<Variable> variables = new ArrayList<Variable>();
 		variables.add(var); variables.add(Function.E); variables.add(Function.PI);
-		return instruction.evaluate(leftChild.evaluate(variables), rightChild.evaluate(variables));
+		return instruction.evaluate(getLeftChild().evaluate(variables), getRightChild().evaluate(variables));
 	}
 	
 	public float evaluate(ArrayList<Variable> variables) throws Exception
@@ -30,13 +30,9 @@ public class BinaryFunction extends Function
 			variables.add(Function.E); 
 		if (!variables.contains(Function.PI))
 			variables.add(Function.PI);
-		return instruction.evaluate(leftChild.evaluate(variables), rightChild.evaluate(variables));
+		return instruction.evaluate(getLeftChild().evaluate(variables), getRightChild().evaluate(variables));
 	}
 
-	@Override
-	public Function[] getChildren() { return new Function[]{leftChild, rightChild}; }
-	@Override
-	public Function setChildren(Function[] children) { leftChild = children[0]; rightChild = children[1]; return this; }
 	@Override
 	public Function getParent() { return parent; }
 	@Override
@@ -50,27 +46,31 @@ public class BinaryFunction extends Function
 				pattern = standardDifferentiationPatterns[i];
 				break;
 			}
-		return pattern.differentiate(this, var);
+		Function diff = pattern.differentiate(this, var);
+		return diff;
 	}
 	
-	public Function getLeftChild() { return leftChild; }
-	public Function getRightChild() { return rightChild; }
+	public Function getLeftChild()  { return children[0];  }
+	public Function getRightChild() { return children[1]; }
 	
 	public String getString()
 	{
 		String str = "";
 		
-		if (needsBracketting(leftChild))
-			str += "(" + leftChild.getString() + ")";
+		if (needsBracketting(getLeftChild()))
+			str += "(" + getLeftChild().getString() + ")";
 		else
-			str += leftChild.getString();
+			str += getLeftChild().getString();
 
-        str += instruction.getString();
+		String op = instruction.getString();
+		if (op.equals("+") || op.equals("-"))
+			str += " " + op + " ";
+		else str += op;
 		
-		if (needsBracketting(rightChild))
-			str += "(" + rightChild.getString() + ")";
+		if (needsBracketting(getRightChild()))
+			str += "(" + getRightChild().getString() + ")";
 		else
-			str += rightChild.getString();
+			str += getRightChild().getString();
 		
 		return str;
 	}
@@ -94,6 +94,7 @@ public class BinaryFunction extends Function
 		public String getString() { return "+"; } 
 		public int getPriority() { return 3; }
 	};
+	
 	public static final BinaryInstruction subtraction = new BinaryInstruction() {
 		@Override
 		public float evaluate(float arg0, float arg1) { return arg0 - arg1; } 
@@ -101,6 +102,7 @@ public class BinaryFunction extends Function
 		public String getString() { return "-"; } 
 		public int getPriority() { return 4; }
 	};
+	
 	public static final BinaryInstruction multiplication = new BinaryInstruction() {
 		@Override
 		public float evaluate(float arg0, float arg1) { return arg0 * arg1; } 
@@ -108,6 +110,7 @@ public class BinaryFunction extends Function
 		public String getString() { return "*"; } 
 		public int getPriority() { return 2; }
 	};
+	
 	public static final BinaryInstruction division = new BinaryInstruction() {
 		@Override
 		public float evaluate(float arg0, float arg1) { return arg0 / arg1; }
@@ -115,6 +118,7 @@ public class BinaryFunction extends Function
 		public String getString() { return "/"; }  
 		public int getPriority() { return 1; }
 	};
+	
 	public static final BinaryInstruction exponentiation = new BinaryInstruction() {
 		@Override
 		public float evaluate(float arg0, float arg1) { return (float) Math.pow(arg0, arg1); }
@@ -122,6 +126,7 @@ public class BinaryFunction extends Function
 		public String getString() { return "^"; } 
 		public int getPriority() { return 0; }
 	};
+	
 	public static final BinaryInstruction modulo = new BinaryInstruction() {
 		@Override
 		public float evaluate(float arg0, float arg1) { return arg0 % arg1; }
@@ -140,6 +145,7 @@ public class BinaryFunction extends Function
 					addition);
 		}
 	};
+	
 	/** Applies the rule (d/dx)(f(x) - g(x)) = f'(x) - g'(x). */
 	public static final DifferentiationPattern dSubtraction = new DifferentiationPattern() {
 		@Override
@@ -153,6 +159,7 @@ public class BinaryFunction extends Function
 				);
 		}
 	};
+	
 	/** Applies the rule (d/dx)(f(x)g(x)) = f(x)g'(x) + f'(x)g(x). */
 	public static final DifferentiationPattern productRule = new DifferentiationPattern() {
 		@Override
@@ -170,6 +177,7 @@ public class BinaryFunction extends Function
 				);
 		}
 	};
+	
 	/** Applies the rule (d/dx)(f(x)/g(x)) = [f'g - fg'] / (g^2). */
 	public static final DifferentiationPattern quotientRule = new DifferentiationPattern() {
 		@Override
@@ -194,6 +202,7 @@ public class BinaryFunction extends Function
 				);
 		}
 	};
+	
 	/** Applies the rule (d/dx)(f(x)^g(x)) = (f^g)[g'ln(f) + g(f'/f)]. */
 	public static final DifferentiationPattern dExponentiation = new DifferentiationPattern() {
 		@Override
@@ -223,6 +232,7 @@ public class BinaryFunction extends Function
 				);
 		}
 	};
+	
 	/** Applying that modulo is non-differentiable. */
 	public static final DifferentiationPattern dModulo = null;
 	
@@ -231,6 +241,7 @@ public class BinaryFunction extends Function
 		{
 			modulo, multiplication, addition, subtraction, division, exponentiation
 		};
+	
 	public static DifferentiationPattern[] standardDifferentiationPatterns =
 		{
 			dModulo, productRule, dAddition, dSubtraction, quotientRule, dExponentiation

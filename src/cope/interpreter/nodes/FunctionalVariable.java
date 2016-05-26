@@ -32,10 +32,6 @@ public class FunctionalVariable extends Function
 	}
 
 	@Override
-	public Function[] getChildren() { return null; }
-	@Override
-	public Function setChildren(Function[] children) { return this; }
-	@Override
 	public Function getParent() { return parent; }
 	@Override
 	public Function setParent(Function parent) { this.parent = parent; return this; }
@@ -47,7 +43,7 @@ public class FunctionalVariable extends Function
 	{
 		if (var.getName().equals(name))
 			return new Constant(1);
-		else return this;
+		else return new Constant(0);
 	}
 	
 	public String getString() { return name; }

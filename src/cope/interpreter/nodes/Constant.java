@@ -20,10 +20,6 @@ public class Constant extends Function
 	public float evaluate(Variable var) { return this.constant; }
 
 	@Override
-	public Function[] getChildren() { return null; }
-	@Override
-	public Function setChildren(Function[] children) { return this; }
-	@Override
 	public Function getParent() { return parent; }
 	@Override
 	public Function setParent(Function parent) { this.parent = parent; return this; }
