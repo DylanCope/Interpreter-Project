@@ -1,8 +1,6 @@
 # Mathematical Interpreting
 
-## Aim and Premises
-
-The aim of this project is to create a piece of software that parses a string as a mathematical function, then is able to 
+The aim of this project is to create a piece of software that parses a string as a mathematical function, and is able to 
 perform various manipulations upon said function.
 
 Functions are converted in tree form for manipulation and evaluation, consider the example function,
@@ -50,3 +48,21 @@ The output is then,
 The full simplification algorithm isn't implemented, the primary problem being with the lack of cancellation of terms across fractions. As of now multiplication and additions of zero makes terms disappears, multiplication and division of one is removed and binary operations between constants are coalesced.
 
 More information about the algorithms and patterns used for simplification and differentiation can be found in the pdf in the latex folder of this repository, https://github.com/DylanCope/Interpreter-Project/blob/master/latex/function_analysis.pdf.
+
+## Features
+
+* Binary Operations: Addition `+`, subtraction `-`, multiplication `*`, division `/`, modulo division `%` and exponentiation `^`.
+* These adhere to the BIDMAS order of operations.
+* Unary Operations: `sin`, `cos`, `tan`, `sinh`, `cosh`, `tanh`, `abs`, `floor`, `ceil`, `sqrt`, `ln`.
+* `pi` and `e` are by variables by default.
+
+## TODO:
+
+* Memoization of function trees.
+* Reduction of fractions through cancellation.
+* Convert to LaTeX (mathmode or qtree representations).
+* Generalise functions for arbitrary dimensionality of the domain and range.
+* All functions currently operate across the real numbers, this should be generalised to arbitrary domains and ranges. 
+* Build a more formal LL(k) grammar for parsing, and implement a more rigorous parsing algorithm. (Current parsing doesn't recognise some valid strings)
+* Add a differential operator that can be used to create differential equations.
+* Implement numerical approximation to integrals
