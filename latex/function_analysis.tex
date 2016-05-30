@@ -109,11 +109,11 @@
 	
 	Functions are converted in tree form for manipulation and evaluation, consider the function $f$,
 	$$
-		f(x, y) = (4x^y - 2\sinh y)(9xy + \cos^2 \ln x)
+		f(x, y) = \frac{4x^y - 2\sinh y}{9xy + \cos^2 \ln x}
 	$$
 	the equivalent function tree is,
 	
-	\Tree [.$f(x,y)$ [.$\times$ 
+	\Tree [.$f(x,y)$ [.$\div$ 
 		[.$-$ 
 			[.$\times$ 
 				[.4 ] 
@@ -135,6 +135,39 @@
 	
 	\section{Differentiation}
 	
-	\section{Simplification}
+	For differentiable function $f, g, h$, with derivatives $f', g', h'$, we can derive patterns for the differentials
+	of our operations of addition, subtraction, multiplication, division and exponentiation.
+	\subsection{Addition/Subtraction}
+	$$
+		f = g \pm h \implies f' = g' \pm h'
+	$$
+	\subsection{Multiplication}
+	\begin{align*}
+		f &= gh \\
+		\therefore f' &= g'h + gh'
+	\end{align*}
+	\subsection{Division}
+	\begin{align*}
+		f &= \frac{g}{h} \\
+		&= g h^{-1} \\
+		\therefore f' &= g' h^{-1} - g h' h^{-2} \\
+		&= \frac{g'h - gh'}{h^2}
+	\end{align*}
+	\subsection{Exponentiation}
+	\begin{align*}
+		f &= g^{h} \\
+		\therefore \ln f &= h \ln g \\
+		\frac{f'}{f} &= h' \ln g + h \frac{g'}{g} \\
+		f' &= g^h \Big(h' \ln g + h \frac{g'}{g}\Big)
+	\end{align*}
 	
+	\section{Simplification}
+	\begin{align*}
+		0\times f &= f\times 0 = 0 \\
+		1\times f &= f\times 1 = f \\
+		0 + f &= f + 0 = f \\
+		f - 0 &= f \\
+		0 - f &= -1 \times f \\ 
+		\frac{f}{1} &= f 
+	\end{align*}
 \end{document}

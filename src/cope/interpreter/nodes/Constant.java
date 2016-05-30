@@ -40,6 +40,16 @@ public class Constant extends Function
 	}
 	
 	public float getValue() { return constant; }
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if (o instanceof Constant) {
+			Constant c = (Constant) o;
+			return c.getValue() == getValue();
+		}
+		return false;
+	}
 
 }
 

@@ -52,5 +52,15 @@ public class FunctionalVariable extends Function
 	public String getType() {
 		return "variable";
 	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if (o instanceof FunctionalVariable) {
+			FunctionalVariable v = (FunctionalVariable) o;
+			return v.getName().equals(name);
+		}
+		return false;
+	}
 
 }

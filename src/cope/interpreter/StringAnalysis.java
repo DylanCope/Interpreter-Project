@@ -3,13 +3,8 @@ package cope.interpreter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import cope.interpreter.nodes.BinaryFunction;
-import cope.interpreter.nodes.BinaryInstruction;
-import cope.interpreter.nodes.Constant;
-import cope.interpreter.nodes.Function;
-import cope.interpreter.nodes.FunctionalVariable;
-import cope.interpreter.nodes.UnaryFunction;
-import cope.interpreter.nodes.UnaryInstruction;
+import cope.interpreter.nodes.*;
+import cope.interpreter.patterns.*;
 
 public class StringAnalysis 
 {
@@ -21,9 +16,9 @@ public class StringAnalysis
 	 * interfaces list, and ordered according to their ASCII value.
 	 */
 	public static char[] standardBinaryOperatorSymbols = 
-		{
-			'%', '*', '+', '-', '/', '^'
-		};
+	{
+		'%', '*', '+', '-', '/', '^'
+	};
 	
 	/**The binaryOperatoPriorities are used to apply priorities to the binary operators. By default, the
 	 * BIDMAS priorities are programmed in.
@@ -32,9 +27,9 @@ public class StringAnalysis
 	 * 
 	 */
 	public static int[] standardBinaryOpertorPriorities =
-		{
-			5, 2, 3, 4, 1, 0
-		};
+	{
+		5, 2, 3, 4, 1, 0
+	};
 
 	/** 
 	 * The standardUnaryOperators are a sorted list of standard, predefined strings for the various
@@ -44,9 +39,9 @@ public class StringAnalysis
 	 * interfaces list, and ordered alphabetically.
 	 */
 	public static String[] standardUnaryOperatorNames =
-		{
-			"abs", "ceil", "cos", "cosh", "floor", "ln", "sin", "sinh", "sqrt", "tan", "tanh"
-		};
+	{
+		"abs", "ceil", "cos", "cosh", "floor", "ln", "sin", "sinh", "sqrt", "tan", "tanh"
+	};
 	
 	/**
 	 * Generates a function tree from a string, based on the assumptions that the function is a single-variable function
@@ -146,11 +141,11 @@ public class StringAnalysis
 		
 		strFunction = separateVerifiedStrings(verifiedStrings, strFunction);
 		strFunction = transformToBinaryOperations(strFunction, binarySymbols, binaryPriorities);
-		System.out.println(strFunction);
+
 		return recursivelyGenerateFunctionTree(
 				strFunction, variables, 
 				binarySymbols, binaryInstructions, 
-				unaryNames, unaryInstructions).simplify();
+				unaryNames, unaryInstructions);
 	}
 	
 	private static Function recursivelyGenerateFunctionTree(

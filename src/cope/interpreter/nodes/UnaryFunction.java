@@ -3,6 +3,7 @@ package cope.interpreter.nodes;
 import java.util.ArrayList;
 
 import cope.interpreter.Variable;
+import cope.interpreter.patterns.*;
 
 public class UnaryFunction extends Function
 {
@@ -59,6 +60,8 @@ public class UnaryFunction extends Function
 		public float evaluate(double arg) { return (float) Math.sin(arg); }
 		@Override
 		public String getString() { return "sin"; }
+		@Override
+		public String getLatex() { return "\text{" + getString() + "}"; }
 	};
 
 	public static final UnaryInstruction cos = new UnaryInstruction() {
@@ -66,6 +69,8 @@ public class UnaryFunction extends Function
 		public float evaluate(double arg) { return (float) Math.cos(arg); }
 		@Override
 		public String getString() { return "cos"; }
+		@Override
+		public String getLatex() { return "\text{" + getString() + "}"; }
 	};
 
 	public static final UnaryInstruction tan = new UnaryInstruction() {
@@ -73,6 +78,8 @@ public class UnaryFunction extends Function
 		public float evaluate(double arg) { return (float) Math.tan(arg); }
 		@Override
 		public String getString() { return "tan"; }
+		@Override
+		public String getLatex() { return "\text{" + getString() + "}"; }
 	};
 
 	public static final UnaryInstruction abs = new UnaryInstruction() {
@@ -80,6 +87,8 @@ public class UnaryFunction extends Function
 		public float evaluate(double arg) { return (float) Math.abs(arg); }
 		@Override
 		public String getString() { return "abs"; }
+		@Override
+		public String getLatex() { return "\text{" + getString() + "}"; }
 	};
 
 	public static final UnaryInstruction sinh = new UnaryInstruction() {
@@ -87,6 +96,8 @@ public class UnaryFunction extends Function
 		public float evaluate(double arg) { return (float) Math.sinh(arg); }
 		@Override
 		public String getString() { return "sinh"; }
+		@Override
+		public String getLatex() { return "\text{" + getString() + "}"; }
 	};
 
 	public static final UnaryInstruction cosh = new UnaryInstruction() {
@@ -94,6 +105,8 @@ public class UnaryFunction extends Function
 		public float evaluate(double arg) { return (float) Math.cosh(arg); }
 		@Override
 		public String getString() { return "cosh"; }
+		@Override
+		public String getLatex() { return "\text{" + getString() + "}"; }
 	};
 
 	public static final UnaryInstruction tanh = new UnaryInstruction() {
@@ -101,6 +114,8 @@ public class UnaryFunction extends Function
 		public float evaluate(double arg) { return (float) Math.tanh(arg); }
 		@Override
 		public String getString() { return "tanh"; }
+		@Override
+		public String getLatex() { return "\text{" + getString() + "}"; }
 	};
 
 	public static final UnaryInstruction floor = new UnaryInstruction() {
@@ -108,6 +123,8 @@ public class UnaryFunction extends Function
 		public float evaluate(double arg) { return (float) Math.floor(arg); }
 		@Override
 		public String getString() { return "floor"; }
+		@Override
+		public String getLatex() { return "\text{" + getString() + "}"; }
 	};
 
 	public static final UnaryInstruction ceil = new UnaryInstruction() {
@@ -115,6 +132,8 @@ public class UnaryFunction extends Function
 		public float evaluate(double arg) { return (float) Math.ceil(arg); }
 		@Override
 		public String getString() { return "ceil"; }
+		@Override
+		public String getLatex() { return "\text{" + getString() + "}"; }
 	};
 
 	public static final UnaryInstruction sqrt = new UnaryInstruction() {
@@ -122,6 +141,8 @@ public class UnaryFunction extends Function
 		public float evaluate(double arg) { return (float) Math.sqrt(arg); }
 		@Override
 		public String getString() { return "sqrt"; }
+		@Override
+		public String getLatex() { return "\text{" + getString() + "}"; }
 	};
 	
 	public static final UnaryInstruction ln = new UnaryInstruction() {
@@ -129,6 +150,8 @@ public class UnaryFunction extends Function
 		public float evaluate(double arg) { return (float) Math.log(arg); }
 		@Override
 		public String getString() { return "ln"; }
+		@Override
+		public String getLatex() { return "\text{" + getString() + "}"; }
 	};
 	
 	public static Function chainRule(UnaryInstruction i, Function f, Variable var) {
@@ -230,13 +253,13 @@ public class UnaryFunction extends Function
 	};
 	
 	public static UnaryInstruction[] standardInstructions =
-		{
-			abs, ceil, cos, cosh, floor, ln, sin, sinh, sqrt, tan, tanh
-		};
+	{
+		abs, ceil, cos, cosh, floor, ln, sin, sinh, sqrt, tan, tanh
+	};
 
 	public static DifferentiationPattern[] standardDifferentiationPatterns =
-		{
-			null, null, dCos, dCosh, null, dLn, dSin, dSinh, dSqrt, dTan, dTanh
-		};
+	{
+		null, null, dCos, dCosh, null, dLn, dSin, dSinh, dSqrt, dTan, dTanh
+	};
 
 }

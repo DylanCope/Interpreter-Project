@@ -3,6 +3,7 @@ package cope.interpreter.nodes;
 import java.util.ArrayList;
 
 import cope.interpreter.Variable;
+import cope.interpreter.patterns.*;
 
 public class BinaryFunction extends Function 
 {
@@ -210,7 +211,6 @@ public class BinaryFunction extends Function
 			Function c0 = f.getChildren()[0];
 			Function c1 = f.getChildren()[1];
 			return new BinaryFunction(
-				f,
 				new BinaryFunction(
 					new BinaryFunction(
 						c1.differentiate(var),
@@ -228,6 +228,7 @@ public class BinaryFunction extends Function
 					),
 					addition
 				),
+				f,
 				multiplication
 				);
 		}

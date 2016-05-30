@@ -1,4 +1,8 @@
 \BOOKMARK [1][-]{section.1}{Functions}{}% 1
 \BOOKMARK [1][-]{section.2}{Parsing}{}% 2
 \BOOKMARK [1][-]{section.3}{Differentiation}{}% 3
-\BOOKMARK [1][-]{section.4}{Simplification}{}% 4
+\BOOKMARK [2][-]{subsection.3.1}{Addition/Subtraction}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{Multiplication}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.3}{Division}{section.3}% 6
+\BOOKMARK [2][-]{subsection.3.4}{Exponentiation}{section.3}% 7
+\BOOKMARK [1][-]{section.4}{Simplification}{}% 8

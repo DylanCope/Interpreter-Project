@@ -2,21 +2,28 @@ package cope.interpreter.nodes;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
-import cope.interpreter.SimplificationPattern;
 import cope.interpreter.Variable;
+import cope.interpreter.patterns.BinaryInstruction;
+import cope.interpreter.patterns.SimplificationPattern;
 
 public abstract class Function implements Cloneable
 {	
-	private String name = "f";
+	private String name = "";
 	
 	protected Function[] children = new Function[]{};
 	
 	public static Variable PI = new Variable("pi", (float) Math.PI);
 	public static Variable E = new Variable("e", (float) Math.E);
 	
-	public Function setName(String name) { this.name = name; return this; }
-	public String toString() { return this.name + "(x) = " + getString(); }
+	public String toString() { 
+		if (name != "")
+			return this.name + "(x) = " + getString(); 
+		return getString();
+	}
+	
 	public String toString(float x) {
 		DecimalFormat df = new DecimalFormat("0.00"); 
 		try {
@@ -24,8 +31,10 @@ public abstract class Function implements Cloneable
 		} catch (Exception e) {} 
 		return "";
 	}
+	
 	public Function[] getChildren() { return children; }
 	public void setChildren(Function[] children) { this.children = children; }
+	public Function setName(String name) { this.name = name; return this; }
 	
 	public abstract float evaluate(Variable var) throws Exception;
 	public abstract float evaluate(ArrayList<Variable> variables) throws Exception;
@@ -43,6 +52,41 @@ public abstract class Function implements Cloneable
 	
 	public abstract Function differentiate(Variable var);
 	
+	public Set<Function> getCommonFactors()
+	{
+		Set<Function> factors = new HashSet<Function>();
+		if (this instanceof BinaryFunction)
+		{
+			BinaryFunction b = (BinaryFunction) this;
+			Set<Function> leftSubFactors = b.getLeftChild().getCommonFactors();
+			Set<Function> rightSubFactors = b.getRightChild().getCommonFactors();
+			
+			BinaryInstruction i = b.getInstruction();
+			
+			if (i.equals(BinaryFunction.multiplication)) 
+			{
+				factors.addAll(leftSubFactors);
+				factors.addAll(rightSubFactors);
+			}
+			else if (i.equals(BinaryFunction.exponentiation)) 
+			{
+				factors.add(b.getLeftChild());
+			}
+			else if (i.equals(BinaryFunction.subtraction)
+					|| i.equals(BinaryFunction.addition))
+			{
+				for (Function f1 : leftSubFactors)
+					for (Function f2 : rightSubFactors)
+						if (f1.equals(f2))
+							factors.add(f1);
+			}
+		}
+		else
+			factors.add(this);
+			
+		return factors;
+	}
+	
 	public Function simplify()
 	{	
 		Function[] children = getChildren();
@@ -58,8 +102,9 @@ public abstract class Function implements Cloneable
 		for (SimplificationPattern p : SimplificationPattern.patterns)
 		{
 			if (p.matches(newThis)) {
-				newThis = p.transform(newThis);
-				newThis = newThis.simplify();
+				Function transformed = p.transform(newThis).simplify();
+//				System.out.println(newThis.getString() + " -> " + transformed.getString());
+				newThis = transformed;
 			}
 		}
 
@@ -84,6 +129,23 @@ public abstract class Function implements Cloneable
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if (o instanceof Function) {
+			Function f = (Function) o;
+			int len = children.length;
+			if (f.getChildren().length != len)
+				return false;
+			
+			boolean eq = true;
+			for (int i = 0; i < len; i++)
+				eq &= children[i].equals(f.getChildren()[i]);
+			return eq;
+		}
+		return false;
 	}
 
 }
