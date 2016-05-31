@@ -9,7 +9,7 @@ Functions are converted in tree form for manipulation and evaluation, consider t
   <img src="https://raw.githubusercontent.com/DylanCope/Interpreter-Project/master/images/example-func.png" />
 </p>
 
-With all the default parameters, the `StringAnalysis` class converts the string `"(4*x^y -2*sinh(y))*(9*x*y + cos(ln(x))^2)"` into the function tree,
+With all the default parameters, a default instance of `Interpreter` class would convert the string `"(4*x^y -2*sinh(y))*(9*x*y + cos(ln(x))^2)"` into the function tree,
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/DylanCope/Interpreter-Project/master/images/example-tree.png" />
@@ -22,15 +22,27 @@ There are four distinct types of operations, binary operations, unary functions,
 
 ## Example Usage
 
-The following code parses the string `"sin(pi*x)^2"` to create a function tree, evaluates the function at `x = 0.25`,
-differentiates and then simplifies.
+The following code is example usage of the intepreter's default settings, 
 
 ```java
 try {
-	Function f = StringAnalysis.getFunction("sin(pi*x)^2");
-	System.out.println(f);
+	Intepreter interpreter = new Interpreter();
+	Function f = interpreter.parse("sin(pi*x)^2");
+	f.setName("f");
+	System.out.println("Let " + f);
 	System.out.println(f.toString(0.25f));
 	System.out.println(f.differentiate().simplify());
+	System.out.println();
+
+	Function g = interpreter.parse("ln(x*y) + x^4 + y", "x", "y");
+	g.setName("g");
+	System.out.println("\nLet " + g + "\n");
+	Function diff = g.differentiate();
+	System.out.println("Differentiating g with respect to x, without simplification:");
+	System.out.println(diff);
+	System.out.println();
+	System.out.println("Simplifying g':");
+	System.out.println(diff.simplify());
 } catch (Exception e1) {
 	e1.printStackTrace();
 	System.exit(1);
@@ -40,14 +52,28 @@ try {
 The output is then,
 
 ```cmd
->> f(x) = sin(pi*x)^2.0
+>> Let f(x) = sin(pi*x)^2.0
 >> f(0.25) = 0.50
->> f(x) = (sin(pi*x)^2.0*2.0*pi*cos(pi*x))/sin(pi*x)
+>> f'(x) = (2.0*pi*cos(pi*x)*sin(pi*x)^2.0)/sin(pi*x)
+>> 
+>> 
+>> Let g(x, y) = ln(x*y) + x^4.0 + y
+>> 
+>> Differentiating g with respect to x, without simplification:
+>> g'(x, y) = (x*0.0 + y*1.0)/(x*y) + (0.0*ln(x) + 4.0*1.0/x)*x^4.0 + 0.0
+>> 
+>> Simplifying g':
+>> g'(x, y) = y/(x*y) + (4.0*x^4.0)/x
 ```
 
-The full simplification algorithm isn't implemented, the primary problem being with the lack of cancellation of terms across fractions. As of now multiplication and additions of zero makes terms disappears, multiplication and division of one is removed and binary operations between constants are coalesced.
-
+The full simplification algorithm isn't implemented, the primary problem being the lack of cancellation of terms across fractions. 
 More information about the algorithms and patterns used for simplification and differentiation can be found in the pdf in the latex folder of this repository, https://github.com/DylanCope/Interpreter-Project/blob/master/latex/function_analysis.pdf.
+
+The constructors for the `Interpreter` class set up the collections of binary operations, unary operations and standard
+variables (such as `pi` and `e`) that are used to parse input. Calling the constructor with no parameters will instantiate the binary and unary operations in accordance with the lists defined by `BinaryFunction.standardInstructions` and `UnaryFunction.standardInstructions`, and the default standard variables are `Function.PI` and `Function.E`.
+
+When parsing a string the interpreter needs a collection of variables that it is trying to identify, if none are provided
+it will assume the string is a univariate function of "x".
 
 ## Features
 
@@ -63,6 +89,5 @@ More information about the algorithms and patterns used for simplification and d
 * Convert to LaTeX (mathmode or qtree representations).
 * Generalise functions for arbitrary dimensionality of the domain and range.
 * All functions currently operate across the real numbers, this should be generalised to arbitrary domains and ranges. 
-* Build a more formal LL(k) grammar for parsing, and implement a more rigorous parsing algorithm. (Current parsing doesn't recognise some valid strings)
 * Add a differential operator that can be used to create differential equations.
 * Implement numerical approximation to integrals
