@@ -9,7 +9,7 @@ Functions are converted in tree form for manipulation and evaluation, consider t
   <img src="https://raw.githubusercontent.com/DylanCope/Interpreter-Project/master/images/example-func.png" />
 </p>
 
-With all the default parameters, a default instance of `Interpreter` class would convert the string `"(4*x^y -2*sinh(y))*(9*x*y + cos(ln(x))^2)"` into the function tree,
+With all the default parameters, an instance of `Interpreter` class would convert the string `"(4*x^y -2*sinh(y))*(9*x*y + cos(ln(x))^2)"` into the function tree,
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/DylanCope/Interpreter-Project/master/images/example-tree.png" />
