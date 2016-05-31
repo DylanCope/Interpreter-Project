@@ -2,6 +2,8 @@ package cope.interpreter.nodes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import cope.interpreter.Variable;
 
@@ -14,7 +16,7 @@ public class FunctionalVariable extends Function
 	{
 		this.name = name;
 	}
-	
+
 	@Override
 	public float evaluate(ArrayList<Variable> variables) throws Exception {
 		for (Variable var : variables)
@@ -35,6 +37,13 @@ public class FunctionalVariable extends Function
 	public Function getParent() { return parent; }
 	@Override
 	public Function setParent(Function parent) { this.parent = parent; return this; }
+	
+	@Override
+	public Set<String> getVariables()	{
+		Set<String> vars = new HashSet<String>();
+		vars.add(name);
+		return vars;
+	}
 	
 	public String getName() { return name; }
 	

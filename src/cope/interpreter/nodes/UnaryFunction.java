@@ -1,9 +1,12 @@
 package cope.interpreter.nodes;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import cope.interpreter.Variable;
-import cope.interpreter.patterns.*;
+import cope.interpreter.patterns.DifferentiationPattern;
+import cope.interpreter.patterns.UnaryInstruction;
 
 public class UnaryFunction extends Function
 {
@@ -54,6 +57,14 @@ public class UnaryFunction extends Function
 	}
 	
 	public String getType() { return "unary"; }
+	
+	@Override
+	public Set<String> getVariables()
+	{
+		Set<String> vars = new HashSet<String>();
+		vars.addAll(childFunction.getVariables());
+		return vars;
+	}
 	
 	public static final UnaryInstruction sin = new UnaryInstruction() {
 		@Override

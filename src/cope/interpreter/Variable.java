@@ -1,6 +1,7 @@
 package cope.interpreter;
 
-public class Variable {
+public class Variable 
+{
 	private String name;
 	private float value = 0;
 	
@@ -11,7 +12,8 @@ public class Variable {
 	
 	public Variable(String name, float value)
 	{
-		this.name = name; this.value = value;
+		this.name = name; 
+		this.value = value;
 	}
 	
 	public String getName() { return this.name; }
@@ -21,4 +23,12 @@ public class Variable {
 	public void set(float value) { this.value = value; }
 	
 	public String toString() { return name; }
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if (o instanceof Variable)
+			return ((Variable) o).getName().equals(name);
+		return false;
+	}
 }

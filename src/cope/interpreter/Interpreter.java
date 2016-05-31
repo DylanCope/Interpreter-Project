@@ -3,24 +3,24 @@ import java.util.HashSet;
 import java.util.Set;
 
 import cope.interpreter.nodes.BinaryFunction;
+import cope.interpreter.nodes.Constant;
 import cope.interpreter.nodes.Function;
+import cope.interpreter.nodes.FunctionalVariable;
 import cope.interpreter.nodes.UnaryFunction;
 import cope.interpreter.patterns.BinaryInstruction;
 import cope.interpreter.patterns.UnaryInstruction;
 
 public class Interpreter 
 {
-	BinaryInstruction[] binops;
-	UnaryInstruction[] unops;
+	private BinaryInstruction[] binops;
+	private UnaryInstruction[] unops;
+	private Set<Variable> standardVars;
 	
-	private final static BinaryInstruction lowestPriority = new BinaryInstruction() 
-	{
+	private final static BinaryInstruction lowestPriority = new BinaryInstruction() {
 		@Override
 		public int getPriority() { return Integer.MIN_VALUE; }
-
 		@Override
 		public String getString() { return null; }
-
 		@Override
 		public float evaluate(float arg0, float arg1) { return 0; }
 	
@@ -30,6 +30,9 @@ public class Interpreter
 	{
 		binops = BinaryFunction.standardInstructions;
 		unops = UnaryFunction.standardInstructions;
+		standardVars = new HashSet<Variable>();
+		standardVars.add(Function.PI); 
+		standardVars.add(Function.E); 
 	}
 	
 	public Interpreter(BinaryInstruction[] binops, UnaryInstruction[] unops)
@@ -38,26 +41,171 @@ public class Interpreter
 		this.unops = unops;
 	}
 	
-	public Function parseString(String str)
+	public Function parse(String str) throws Exception
 	{
-		return parseString(str, "x");
+		return parse(str, "x");
 	}
 	
-	public Function parseString(String str, String v)
+	public Function parse(String str, String...vars) throws Exception
 	{
-		return parseString(str, new Variable(v));
+		Set<Variable> vs = new HashSet<Variable>();
+		for (String v : vars)
+			vs.add(new Variable(v));
+		return parse(str, vs);
 	}
 	
-	public Function parseString(String str, Variable v)
+	public Function parse(String str, Set<Variable> vars) throws Exception
 	{
-		Set<Variable> vars = new HashSet<Variable>();
-		vars.add(v);
-		return parseString(str, vars);	
+		str = removeSpaces(str);
+		str = removeSuperfluousBrackets(str);
+		str = placeBrackets(str);
+		vars.addAll(standardVars);
+		return parseFormatted(str, vars);
 	}
 	
-	public Function parseString(String str, Set<Variable> vars)
+	private String removeSpaces(String str)
 	{
-		return null;
+		String[] split = str.split("\\s++");
+		String result = "";
+		for (String s : split)
+			result += s;
+		return result;
+	}
+	
+	/**
+	 * Attempts to build a function tree that describes a given string, assuming
+	 * the string has been formatted properly. A properly formatted
+	 * string should be correctly bracketed according the the prioritization of
+	 * the binary operations.
+	 * @param str - String to be parsed.
+	 * @param vars
+	 * @return
+	 * @throws Exception
+	 */
+	private Function parseFormatted(String str, Set<Variable> vars) throws Exception
+	{
+		int len = str.length();
+		if (str.startsWith("(") && bracketCloseIndex(0, str) == len - 1)
+			return parseFormatted(str.substring(1, len-1), vars);
+
+		try {
+			return buildBinop(str, vars);
+		}
+		catch (Exception e1) {
+			try {
+				return buildUnop(str, vars);
+			} 
+			catch (Exception e2) {
+				try {
+					return parseVariable(str, vars);
+				} 
+				catch (Exception e3) {
+					try {
+						return parseConstant(str);
+					}
+					catch (Exception e4){
+						throw new Exception("Cannot parse " + str);
+					}
+				}
+			}
+		}
+		
+	}
+	
+	/**
+	 * Attempts to parse a string a binary operation. This assumes the given
+	 * string has been perfected bracketed according to the prioritizations of
+	 * binary operations that have been given to the interpreter.
+	 * @param str - the String to be parsed.
+	 * @param vars - A list of possible variables in str.
+	 * @return A "BinaryFunction" node that describes str.
+	 * @throws Exception if str cannot be parsed as a binary operation.
+	 */
+	private Function buildBinop(String str, Set<Variable> vars) throws Exception
+	{
+		int len = str.length();
+		for (int i = 0; i < len; i++)
+		{
+			if (str.charAt(i) == '(') {
+				i = bracketCloseIndex(i, str);
+				continue;
+			}
+			
+			for (BinaryInstruction op : binops)
+			{
+				String opstr = op.getString();
+				int j = i + opstr.length();
+				String substr = str.substring(i, j);
+				if (substr.equals(opstr))
+				{
+					String lstr = str.substring(0, i);
+					String rstr = str.substring(j);
+					return new BinaryFunction(
+						parseFormatted(lstr, vars),
+						parseFormatted(rstr, vars),
+						op
+					);
+				}
+			}
+		}
+		throw new Exception("Cannot build binary function from " + str);
+	}
+	
+	/**
+	 * Attempts to parse a string as a unary operator, based on the list
+	 * of unary operators the interpreter has been told to accept.
+	 * @param str - String to be parsed.
+	 * @param vars - A list of possible variables in str.
+	 * @return A "UnaryFunction" node describing str.
+	 * @throws Exception if str cannot be parsed as a unary operation.
+	 */
+	private Function buildUnop(String str, Set<Variable> vars) throws Exception
+	{
+		for (UnaryInstruction op : unops)
+		{
+			String opstr = op.getString();
+			int i = opstr.length();
+			String substr = str.substring(0, i);
+			if (substr.equals(opstr))
+				return new UnaryFunction(
+					parseFormatted(str.substring(i), vars), op
+				);
+		}
+		throw new Exception("Cannot build unary function from " + str);
+	}
+	
+	/**
+	 * Attempts to parse a string as a variable, given a list of possible
+	 * variables.
+	 * @param str - String to be parsed.
+	 * @param vars - List of possible variables.
+	 * @return A "FunctionalVariable" node describing str.
+	 * @throws Exception if str cannot be parsed as a variable.
+	 */
+	private Function parseVariable(String str, Set<Variable> vars) throws Exception
+	{
+		for (Variable v : vars) {
+			if (str.equals(v.getName()))
+				return new FunctionalVariable(v.getName());
+		}
+		throw new Exception("Cannot parse + \"" + str + "\" as a variable.");
+	}
+	
+	/**
+	 * Attempts to pass a given string a floating point constant.
+	 * @param str - String to be parsed.
+	 * @return A "Constant" function node with a value described by str 
+	 * @throws Exception if str cannot be parsed a floating point number.
+	 */
+	private Function parseConstant(String str) throws Exception
+	{
+		try {
+			float value = Float.parseFloat(str);
+			return new Constant(value);
+		}
+		catch (Exception e) {
+			throw new Exception("Cannot parse + \"" + str + "\" as a constant.");
+		}
 	}
 	
 	/**
@@ -81,8 +229,8 @@ public class Interpreter
 				return i;
 		}
 		if (openBrackets != 0)
-			throw new Exception("Unbalanced bracketting");
-		return i;
+			throw new Exception("Unbalanced bracketting in \"" + str + "\" from " + i0);
+		return i-1;
 	}
 	
 	/**
@@ -92,7 +240,7 @@ public class Interpreter
 	 * @return
 	 * @throws Exception if the bracketing is mismatched.
 	 */
-	public int unbracketedBinops(String str) throws Exception
+	private int unbracketedBinops(String str) throws Exception
 	{
 		String result = str;
 		int len = str.length();
@@ -124,9 +272,9 @@ public class Interpreter
 	 * @return A new string that represents a properly bracketed str
 	 * @throws Exception if there is a mismatch of brackets already in str.
 	 */
-	public String placeBrackets(String str) throws Exception
+	private String placeBrackets(String str) throws Exception
 	{
-		if (unbracketedBinops(str) <= 1)
+		if (unbracketedBinops(str) == 0)
 			return str;
 		
 		String result = str;
@@ -140,7 +288,7 @@ public class Interpreter
 			char c = result.charAt(i);
 			if (c == '(') 
 			{
-				int close = bracketCloseIndex(i, str);
+				int close = bracketCloseIndex(i, result);
 				String substr = result.substring(i+1, close);
 				if (close != i+1) 
 				{
@@ -178,21 +326,17 @@ public class Interpreter
 			right = placeBrackets(right);
 			
 			String temp = "";
-			if (unbracketedBinops(left) > 0) {
-				temp += "(";
-				temp += left;
-				temp += ")";
-			}
-			else temp += left;
+//			if (unbracketedBinops(left) > 0) {
+				temp += "(" + left + ")";
+//			}
+//			else temp += left;
 			
 			temp += best.getString();
 
-			if (unbracketedBinops(right) > 0) {
-				temp += "(";
-				temp += right;
-				temp += ")";
-			}
-			else temp += right;
+//			if (unbracketedBinops(right) > 0) {
+				temp += "(" + right +  ")";
+//			}
+//			else temp += right;
 			
 			result = temp;
 		}
@@ -206,29 +350,28 @@ public class Interpreter
 	 * @return A version of str without superfluous bracketing
 	 * @exception Exception thrown if str contains mismatching brackets
 	 */
-	public String removeSuperfluousBrackets(String str) throws Exception
+	private String removeSuperfluousBrackets(String str) throws Exception
 	{
 		int len = str.length();
 		String result = str;
 		
-		while (result.startsWith("((") && result.endsWith("))")) {
-			result = result.substring(1, len-1);
-			len = result.length();
-		}
-		
 		for (int i = 0; i < len; i++)
 		{
-			char c = result.charAt(i);
-			if (c == '(')
+			char c1 = result.charAt(i);
+			if (c1 == '(' && i+1 < len)
 			{
-				int close = bracketCloseIndex(i, str);
-				System.out.println("index " + i + " to " + close + " in " + result);
-				String substr = result.substring(i, close);
-//				System.out.println(str + " -> " + substr);
+				int close1 = bracketCloseIndex(i, result);
+				char c2 = result.charAt(i+1);
+				if (c2 != '(') 
+					continue;
+				int close2 = bracketCloseIndex(i+1, result);
+				if (close2 != close1 - 1)
+					continue;
+				
+				String substr = result.substring(i+1, close2);
 				String temp = result.substring(0, i);
-				temp += removeSuperfluousBrackets(substr);
-				i = temp.length();
-				temp += result.substring(close);
+				temp += substr;
+				temp += result.substring(close1);
 				result = temp;
 				len = result.length();
 			}

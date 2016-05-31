@@ -3,6 +3,7 @@ package cope.interpreter.nodes;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import cope.interpreter.Variable;
@@ -18,13 +19,27 @@ public abstract class Function implements Cloneable
 	public static Variable PI = new Variable("pi", (float) Math.PI);
 	public static Variable E = new Variable("e", (float) Math.E);
 	
-	public String toString() { 
+	public String toString() 
+	{ 
+		Set<String> vars = getVariables();
+		vars.remove(PI.getName());
+		vars.remove(E.getName());
+		String varStr = "";
+		Iterator<String> iterator = vars.iterator();
+		while (iterator.hasNext())
+		{
+			String next = iterator.next();
+			varStr += next;
+			if (iterator.hasNext())
+				varStr += ", ";
+		}
 		if (name != "")
-			return this.name + "(x) = " + getString(); 
+			return this.name + "(" + varStr + ") = " + getString(); 
 		return getString();
 	}
 	
-	public String toString(float x) {
+	public String toString(float x) 
+	{
 		DecimalFormat df = new DecimalFormat("0.00"); 
 		try {
 			return this.name + "(" + x + ") = " + df.format(evaluate(new Variable("x", x)));
@@ -42,6 +57,7 @@ public abstract class Function implements Cloneable
 	public abstract Function setParent(Function parent);
 	public abstract String getString();
 	public abstract String getType();
+	public abstract Set<String> getVariables();
 	
 	public Function differentiate() 
 	{ 
@@ -108,6 +124,7 @@ public abstract class Function implements Cloneable
 			}
 		}
 
+		newThis.setName(name);
 		return newThis;
 	}
 	
@@ -134,7 +151,8 @@ public abstract class Function implements Cloneable
 	@Override
 	public boolean equals(Object o)
 	{
-		if (o instanceof Function) {
+		if (o instanceof Function) 
+		{
 			Function f = (Function) o;
 			int len = children.length;
 			if (f.getChildren().length != len)

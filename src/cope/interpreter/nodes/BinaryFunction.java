@@ -1,9 +1,12 @@
 package cope.interpreter.nodes;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import cope.interpreter.Variable;
-import cope.interpreter.patterns.*;
+import cope.interpreter.patterns.BinaryInstruction;
+import cope.interpreter.patterns.DifferentiationPattern;
 
 public class BinaryFunction extends Function 
 {
@@ -36,8 +39,18 @@ public class BinaryFunction extends Function
 
 	@Override
 	public Function getParent() { return parent; }
+	
 	@Override
 	public Function setParent(Function parent) { this.parent = parent; return this; }
+	
+	@Override
+	public Set<String> getVariables() 
+	{ 
+		Set<String> vars = new HashSet<String>();
+		vars.addAll(getLeftChild().getVariables());
+		vars.addAll(getRightChild().getVariables());
+		return vars;
+	}
 	
 	public Function differentiate(Variable var)
 	{
@@ -51,7 +64,7 @@ public class BinaryFunction extends Function
 		return diff;
 	}
 	
-	public Function getLeftChild()  { return children[0];  }
+	public Function getLeftChild()  { return children[0]; }
 	public Function getRightChild() { return children[1]; }
 	
 	public String getString()

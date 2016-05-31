@@ -1,6 +1,8 @@
 package cope.interpreter.nodes;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import cope.interpreter.Variable;
 
@@ -37,6 +39,12 @@ public class Constant extends Function
 	@Override
 	public String getType() {
 		return "constant";
+	}
+	
+	@Override
+	public Set<String> getVariables()
+	{
+		return new HashSet<String>();
 	}
 	
 	public float getValue() { return constant; }
