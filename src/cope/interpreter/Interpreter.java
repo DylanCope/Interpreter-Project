@@ -1,4 +1,7 @@
 package cope.interpreter;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,12 +33,31 @@ public class Interpreter
 	{
 		binops = BinaryFunction.standardInstructions;
 		unops = UnaryFunction.standardInstructions;
+		
+		// arrays are sorted so that conflicts such as sinh and sin are handled naturally
+		Arrays.sort(binops, new Comparator<BinaryInstruction>() {
+
+			@Override
+			public int compare(BinaryInstruction arg0, BinaryInstruction arg1) {
+				return arg0.getString().compareTo(arg1.getString());
+			}
+			
+		});
+		Arrays.sort(unops, new Comparator<UnaryInstruction>() {
+
+			@Override
+			public int compare(UnaryInstruction arg0, UnaryInstruction arg1) {
+				return arg1.getString().compareTo(arg0.getString());
+			}
+			
+		});
+		
 		standardVars = new HashSet<Variable>();
 		standardVars.add(Function.PI); 
 		standardVars.add(Function.E); 
 	}
 	
-	public Interpreter(BinaryInstruction[] binops, UnaryInstruction[] unops)
+	public Interpreter(BinaryInstruction[] binops, UnaryInstruction[] unops, Collection<Variable> vars)
 	{
 		this.binops = binops;
 		this.unops = unops;

@@ -28,7 +28,7 @@ public class Main
 			System.out.println(h.simplify());
 			System.out.println("\n");
 			
-			Function f = interpreter.parse("sin(pi*x)^2");
+			Function f = interpreter.parse("(4*x^y - 2*sinh(y))*(9*x*y + cos(ln(x))^2)", "x", "y");//sin(pi*x)^2");
 			f.setName("f");
 			System.out.println("Let " + f);
 			System.out.println(f.toString(0.25f));
@@ -42,9 +42,8 @@ public class Main
 			System.out.println("Differentiating g with respect to x, without simplification:");
 			System.out.println(diff);
 			System.out.println();
-			Function simp = diff.simplify();
 			System.out.println("Simplifying g':");
-			System.out.println(simp);
+			System.out.println(diff.simplify());
 		} 
 		catch (Exception e1) {
 			e1.printStackTrace();
